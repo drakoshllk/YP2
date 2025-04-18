@@ -41,19 +41,6 @@ class Student:
         cursor.executemany("INSERT INTO student (name, surname, patronymic, group_number, ratings_ID) VALUES (?, ?, ?, ?, ?)", (student_info,))
         cursor.executemany("INSERT INTO ratings (rating_first, rating_second, rating_third, rating_fourth) VALUES (?, ?, ?, ?)",(self.__get_ratings(),))
 
-    def __get_name(self):
-        return self.__name
-    def __get_surname(self):
-        return self.__surname
-    def __get_patronymic(self):
-        return self.__patronymic
-    def __get_group_number(self):
-        return self.__group_number
-    def __get_ratings(self):
-        return self.__ratings
-    def __get_ratings_ID(self):
-        return self.__ratings_ID
-
     def display_whole_tables(self):
         cursor.execute("SELECT * FROM student")
         print(f"                                                     STUDENT\n"
@@ -103,3 +90,16 @@ class Student:
         print(f"                                                     AVG group rating\n"
               f"------------------------------------------------------------------------------------------------------------------------\n"
               f"{AVG_group_rating}")
+
+    def __get_name(self):
+        return self.__name
+    def __get_surname(self):
+        return self.__surname
+    def __get_patronymic(self):
+        return self.__patronymic
+    def __get_group_number(self):
+        return self.__group_number
+    def __get_ratings(self):
+        return self.__ratings
+    def __get_ratings_ID(self):
+        return self.__ratings_ID
