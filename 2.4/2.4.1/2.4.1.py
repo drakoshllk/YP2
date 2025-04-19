@@ -1,5 +1,4 @@
 import sqlite3
-import random
 
 con = sqlite3.connect("metanit.db")
 cursor = con.cursor()
