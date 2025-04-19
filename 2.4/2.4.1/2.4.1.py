@@ -102,3 +102,5 @@ class Student:
         return self.__ratings
     def __get_ratings_ID(self):
         return self.__ratings_ID
+
+cursor.close()
