@@ -40,7 +40,7 @@ class Student:
         cursor.executemany("INSERT INTO student (name, surname, patronymic, group_number, ratings_ID) VALUES (?, ?, ?, ?, ?)", (student_info,))
         cursor.executemany("INSERT INTO ratings (rating_first, rating_second, rating_third, rating_fourth) VALUES (?, ?, ?, ?)",(self.__get_ratings(),))
 
-    def display_whole_tables(self):
+    def display_whole_students(self):
         cursor.execute("SELECT * FROM student")
         print(f"                                                     STUDENT\n"
               f"------------------------------------------------------------------------------------------------------------------------")
@@ -102,5 +102,3 @@ class Student:
         return self.__ratings
     def __get_ratings_ID(self):
         return self.__ratings_ID
-
-cursor.close()
