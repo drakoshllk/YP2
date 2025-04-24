@@ -6,9 +6,9 @@ cursor.execute("""
     CREATE TABLE if not exists monitoring
     (
         monitoring_ID INTEGER PRIMARY Key AUTOINCREMENT,
-        CPU_load INTEGER NOT NULL,
-        used_RAM INTEGER NOT NULL,
-        disk_load INTEGER NOT NULL,
+        CPU_load REAL NOT NULL,
+        used_RAM REAL NOT NULL,
+        disk_load REAL NOT NULL,
         monitoring_time TEXT NOT NULL
     );
 """)
