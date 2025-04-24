@@ -45,13 +45,13 @@ class Student:
         print(f"                                                     STUDENT\n"
               f"------------------------------------------------------------------------------------------------------------------------")
         for person in cursor.fetchall():
-            print(f"student_ID:{person[0]} - name:{person[1]} - surname:{person[2]} - patronymic:{person[3]} - group_number:{person[4]} - ratings_ID:{person[5]}")
+            print(f"student_ID: {person[0]} - name: {person[1]} - surname: {person[2]} - patronymic: {person[3]} - group_number: {person[4]} - ratings_ID: {person[5]}")
         print("------------------------------------------------------------------------------------------------------------------------")
         cursor.execute("SELECT * FROM ratings")
         print(f"                                                     RATINGS\n"
               f"------------------------------------------------------------------------------------------------------------------------")
         for rating in cursor.fetchall():
-            print(f"PK:{rating[0]} - {rating[1]} - {rating[2]} - {rating[3]} - {rating[4]}")
+            print(f"PK: {rating[0]} - {rating[1]} - {rating[2]} - {rating[3]} - {rating[4]}")
 
     def display_student_info(self, student_ID):
         cursor.execute(f"SELECT * FROM student WHERE student_ID={student_ID}")
@@ -59,13 +59,13 @@ class Student:
         print(f"                                                     STUDENT\n"
               f"------------------------------------------------------------------------------------------------------------------------")
         print(
-            f"student_ID:{student_ID} - name:{name} - surname:{surname} - patronymic:{patronymic} - group_number:{group_number} - ratings_ID:{ratings_ID}")
+            f"student_ID: {student_ID} - name: {name} - surname: {surname} - patronymic: {patronymic} - group_number: {group_number} - ratings_ID: {ratings_ID}")
         print("------------------------------------------------------------------------------------------------------------------------")
         cursor.execute(f"SELECT * FROM ratings WHERE ratings_ID={ratings_ID}")
         rating_first, rating_second, rating_third, rating_fourth = cursor.fetchone()[1:]
         print(f"                                                     RATINGS\n"
               f"------------------------------------------------------------------------------------------------------------------------")
-        print(f"PK:{ratings_ID} - {rating_first} - {rating_second} - {rating_third} - {rating_fourth}")
+        print(f"PK: {ratings_ID} - {rating_first} - {rating_second} - {rating_third} - {rating_fourth}")
 
     def update_student(self, parameter, value, student_ID):
         cursor.execute(f"UPDATE student SET {parameter} = '{value}' WHERE student_ID='{student_ID}'")
@@ -102,3 +102,5 @@ class Student:
         return self.__ratings
     def __get_ratings_ID(self):
         return self.__ratings_ID
+
+cursor.close()
