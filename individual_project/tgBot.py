@@ -5,6 +5,7 @@ bot = telebot.TeleBot('7215955531:AAH9xQ7vkJs_SuZRF9CWcLgbfgW7lvHsMEs')
 
 wallet, balance = 30000, 10000
 welcome_message = "Привет, лудик, в нашем казино есть несколько игр: крашер, слоты и блэкджек. Так же у тебя есть баланс казино и твой кошель. Ты можешь как вывести баланс с казика, так и пополнить. Так же ты можешь взять вирты в долг. Проверить баланс и кошелек ты можешь посмотрет по соответствующей кнопке. Приятной игры и удачи!"
+slots_arr = ('🟡', '💎', '🍋', '🍏', '🍒', '7️⃣')
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
@@ -39,9 +40,66 @@ def on_click(message):
         usr_msg = bot.send_message(message.chat.id, 'Напиши сумму ставки и икс на который ставишь через запятую')
         bot.register_next_step_handler(usr_msg, crasher)
     elif message.text == 'Слоты':
-        bot.register_next_step_handler(message, on_click)
+        usr_msg = bot.send_message(message.chat.id, 'Напиши сумму ставки')
+        bot.register_next_step_handler(usr_msg, slots)
     elif message.text == 'Блэкджэк':
+        usr_msg = bot.send_message(message.chat.id, 'Напиши сумму ставки')
+        bot.register_next_step_handler(usr_msg, blackjack)
+    else:
+        bot.send_message(message.chat.id, 'Неизвестная команда')
         bot.register_next_step_handler(message, on_click)
+
+def blackjack(message):
+    pass
+
+def slots(message):
+    global bet_amount
+    try:
+        bet_amount = int(message.text)
+    except ValueError:
+        bot.send_message(message.chat.id, 'Неверное число!')
+        bot.register_next_step_handler(message, on_click)
+        return 1
+    global balance
+    if bet_amount > balance or bet_amount < 0:
+        bot.send_message(message.chat.id, 'У вас нет столько денег на счету!')
+        bot.register_next_step_handler(message, on_click)
+    else:
+        balance -= bet_amount
+        var_data = bot.send_message(message.chat.id, f'Со счета списано {bet_amount}')
+        time.sleep(2)
+        global slots_arr
+        play_combination = [random.choice(slots_arr), random.choice(slots_arr), random.choice(slots_arr)]
+        bot.edit_message_text(play_combination[0], var_data.chat.id, var_data.message_id)
+        time.sleep(4)
+        bot.edit_message_text(play_combination[0] + play_combination[1], var_data.chat.id, var_data.message_id)
+        time.sleep(4)
+        bot.edit_message_text(play_combination[0] + play_combination[1] + play_combination[2], var_data.chat.id, var_data.message_id)
+        time.sleep(2)
+        if all(i == play_combination[0] for i in play_combination):
+            win_amount = calculate_win_amount(play_combination, bet_amount)
+            balance += win_amount
+            bot.edit_message_text(f'Вы Выиграли!\nВаша ставка: {bet_amount}\n'
+                                       f'На ваш счет зачислено: {win_amount}', var_data.chat.id, var_data.message_id)
+            bot.register_next_step_handler(message, on_click)
+        else:
+            bot.edit_message_text(f'Вы проиграли!', var_data.chat.id, var_data.message_id)
+            bot.register_next_step_handler(message, on_click)
+
+def calculate_win_amount(play_combination, bet_amount):
+    global slots_arr
+    if play_combination[0] == slots_arr[0]:
+        return bet_amount * 100
+    elif play_combination[0] == slots_arr[1]:
+        return bet_amount * 10
+    elif play_combination[0] == slots_arr[2]:
+        return bet_amount * 5
+    elif play_combination[0] == slots_arr[3]:
+        return bet_amount * 3
+    elif play_combination[0] == slots_arr[4]:
+        return bet_amount
+    elif play_combination[0] == slots_arr[5]:
+        return bet_amount * 1000
 
 def crasher(message):
     global bet_amount, user_x
@@ -54,7 +112,7 @@ def crasher(message):
         bot.register_next_step_handler(message, on_click)
         return 1
     global balance
-    if bet_amount > balance or user_x < 0 or user_x > 10:
+    if bet_amount > balance or bet_amount < 0 or user_x < 0 or user_x > 10:
         bot.send_message(message.chat.id,'Либо у вас нет столько денег на счету, либо ставка недопустима!')
         bot.register_next_step_handler(message, on_click)
     else:
