@@ -157,12 +157,12 @@ def balance_replenishment(message): #пополнение баланса каз�
         send_exit_message(message, 'Вы ввели недопустимое число!')#!ОТРЕДАКТИРОВАТЬ! проверка является ли числом
         return 1
     global balance, wallet
-    if wallet >= replenishment_value:
+    if replenishment_value <= 0:
+        send_exit_message(message, 'Введено недопустимое число')#!ОТРЕДАКТИРОВАТЬ!
+    elif wallet >= replenishment_value:
         balance += replenishment_value
         wallet -= replenishment_value
         send_exit_message(message, 'Пополнение прошло успешно!')#!ОТРЕДАКТИРОВАТЬ!
-    elif replenishment_value <= 0:
-        send_exit_message(message, 'Введено недопустимое число')#!ОТРЕДАКТИРОВАТЬ!
     else:
         send_exit_message(message, 'В твоем кошельке нет столько деняг!')#!ОТРЕДАКТИРОВАТЬ!
 
@@ -173,12 +173,12 @@ def withdraw(message):
         send_exit_message(message, 'Вы ввели недопустимое число!')#!ОТРЕДАКТИРОВАТЬ! проверка является ли числом
         return 1
     global balance, wallet
-    if balance >= withdraw_value:
+    if withdraw_value <= 0:
+        send_exit_message(message, 'Вы ввели недопустимое число!')#!ОТРЕДАКТИРОВАТЬ!
+    elif balance >= withdraw_value:
         balance -= withdraw_value
         wallet += withdraw_value
         send_exit_message(message, 'Вывод прошел успешно!')#!ОТРЕДАКТИРОВАТЬ!
-    elif withdraw_value <= 0:
-        send_exit_message(message, 'Вы ввели недопустимое число!')#!ОТРЕДАКТИРОВАТЬ!
     else:
         send_exit_message(message, 'На твоем счету в казиныче нет столько деняг!')#!ОТРЕДАКТИРОВАТЬ!
 
