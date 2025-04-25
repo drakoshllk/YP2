@@ -6,19 +6,18 @@ from telebot import types
 bot = telebot.TeleBot('7215955531:AAH9xQ7vkJs_SuZRF9CWcLgbfgW7lvHsMEs')
 
 wallet, balance = 30000, 10000
-welcome_message = "Привет, лудик, в нашем казино есть несколько игр: крашер, слоты и блэкджек. Так же у тебя есть баланс казино и твой кошель. Ты можешь как вывести баланс с казика, так и пополнить. Так же ты можешь взять вирты в долг. Проверить баланс и кошелек ты можешь посмотрет по соответствующей кнопке. Приятной игры и удачи!"
+welcome_message = "Привет, лудик, в нашем казино есть несколько игр: крашер, слоты и коинфлип. Так же у тебя есть баланс казино и твой кошель. Ты можешь как вывести баланс с казика, так и пополнить. Так же ты можешь взять вирты в долг. Проверить баланс и кошелек ты можешь посмотрет по соответствующей кнопке. Приятной игры и удачи!"
 slots_arr = ('🟡', '💎', '🍋', '🍏', '🍒', '7️⃣')
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
     keyboard = (types.KeyboardButton('Проверить кошелек'), types.KeyboardButton('Проверить баланс'), types.KeyboardButton('Взять кредит'),
                 types.KeyboardButton('Вывод'), types.KeyboardButton('Додэп'), types.KeyboardButton('Крашер'),
-                types.KeyboardButton('Слоты'), types.KeyboardButton('Блэкджэк'), types.KeyboardButton('Коинфлип'))
+                types.KeyboardButton('Слоты'), types.KeyboardButton('Коинфлип'))
     reply_markup = types.ReplyKeyboardMarkup()
     reply_markup.row(keyboard[0], keyboard[1], keyboard[2])
     reply_markup.row(keyboard[3], keyboard[4])
     reply_markup.row(keyboard[5], keyboard[6], keyboard[7])
-    reply_markup.row(keyboard[8])
     bot.send_message(message.chat.id, welcome_message, reply_markup=reply_markup)
     bot.register_next_step_handler(message, on_click)
 
@@ -44,28 +43,27 @@ def on_click(message):
     elif message.text == 'Слоты':
         usr_msg = bot.send_message(message.chat.id, 'Напиши сумму ставки')
         bot.register_next_step_handler(usr_msg, slots)
-    elif message.text == 'Блэкджэк':
-        usr_msg = bot.send_message(message.chat.id, 'Напиши сумму ставки')
-        bot.register_next_step_handler(usr_msg, blackjack)
     elif message.text == 'Коинфлип':
-        usr_msg = bot.send_message(message.chat.id, 'Напиши сумму ставки')
+        usr_msg = bot.send_message(message.chat.id, 'Напиши сумму ставки и сторону на которую ставишь через запятую (0 - решка, 1 - орел)')
         bot.register_next_step_handler(usr_msg, coinflip)
-    else:
-        bot.send_message(message.chat.id, 'Неизвестная команда')
-        bot.register_next_step_handler(message, on_click)
 
 
 def coinflip(message):
-    global bet_amount
+    global bet_amount, user_side
     try:
-        bet_amount = int(message.text)
+        bet_amount, user_side = message.text.split(',')
+        bet_amount = int(bet_amount)
+        user_side = int(user_side)
     except ValueError:
-        bot.send_message(message.chat.id, 'Неверное число!')
+        bot.send_message(message.chat.id, 'Неверная форма ввода!')
         bot.register_next_step_handler(message, on_click)
         return 1
     global balance
     if bet_amount > balance or bet_amount < 0:
         bot.send_message(message.chat.id, 'У вас нет столько денег на счету!')
+        bot.register_next_step_handler(message, on_click)
+    elif user_side > 1 or user_side < 0:
+        bot.send_message(message.chat.id, 'Неверная форма ввода! 1 или 0!')
         bot.register_next_step_handler(message, on_click)
     else:
         balance -= bet_amount
@@ -73,60 +71,15 @@ def coinflip(message):
         time.sleep(2)
         bot.edit_message_text("Подкидываем монетку...", var_data.chat.id, var_data.message_id)
         time.sleep(4)
-
-
-def blackjack(message):
-    global bet_amount
-    try:
-        bet_amount = int(message.text)
-    except ValueError:
-        bot.send_message(message.chat.id, 'Неверное число!')
-        bot.register_next_step_handler(message, on_click)
-        return 1
-    global balance
-    if bet_amount > balance or bet_amount < 0:
-        bot.send_message(message.chat.id, 'У вас нет столько денег на счету!')
-        bot.register_next_step_handler(message, on_click)
-    else:
-        balance -= bet_amount
-        var_data = bot.send_message(message.chat.id, f'Со счета списано {bet_amount}')
-        time.sleep(2)
-        bot.edit_message_text("Раздача...", var_data.chat.id, var_data.message_id)
-        time.sleep(4)
-        diler_hand = random.randint(15, 23)
-        cards = (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 10, 10, 10)
-        global player_hand
-        player_hand = random.choice(cards) + random.choice(cards)
-        if diler_hand > 21 and player_hand != 21:
+        generated_side = random.randint(0, 1)
+        if generated_side == user_side:
             balance += bet_amount * 2
-            bot.edit_message_text(f'Вы Выиграли! Дилер перебрал!\n'
-                                  f'На ваш счет зачислено: {bet_amount * 2}', var_data.chat.id, var_data.message_id)
-            bot.register_next_step_handler(message, on_click)
-        elif player_hand == 21 and diler_hand != 21:
-            balance += bet_amount * 2.5
-            bot.edit_message_text(f'Блэкджек! Вы Выиграли!\n'
-                                  f'На ваш счет зачислено: {bet_amount * 2.5}', var_data.chat.id, var_data.message_id)
+            bot.edit_message_text(f'Вы Выиграли!\nНа ваш счет зачислено: {bet_amount * 2}', var_data.chat.id, var_data.message_id)
             bot.register_next_step_handler(message, on_click)
         else:
-            if player_hand_generate(player_hand, var_data):
-                pass
-            else:
-                pass
+            bot.edit_message_text(f'Вы проиграли!', var_data.chat.id, var_data.message_id)
+            bot.register_next_step_handler(message, on_click)
 
-def player_hand_generate(player_hand, var_data):
-
-    reply_markup = types.InlineKeyboardMarkup()
-    keyboard = (types.InlineKeyboardButton('Взять', callback_data='take'), types.InlineKeyboardButton('Хватит', callback_data='drop'))
-    reply_markup.row(keyboard[0])
-    reply_markup.row(keyboard[1])
-    bot.edit_message_text(f'В вашей руке {player_hand}\n', var_data.chat.id, var_data.message_id, reply_markup=reply_markup)
-
-@bot.callback_query_handler(func=lambda callback: True)
-def callback_message(callback):
-    if callback.data == 'take':
-        pass
-    elif callback.data == 'drop':
-        pass
 
 def slots(message):
     global bet_amount
